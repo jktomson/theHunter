@@ -1,0 +1,341 @@
+/* home.module.css */
+
+.allreturn {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;        /* header 横向布局 */
+  align-items: center;        /* 垂直居中 */
+  justify-content: space-between; /* 左右两端对齐，中间占满 */
+  padding: 0 40px;
+  height: 80px;
+  background: linear-gradient(135deg, #031203 20%, #010701 80%);;
+  border-bottom: 1px solid #eee;
+  color: #fefefe;
+  margin: 20px;
+  border-radius: 10px;
+  font-size: 20px;
+}
+
+/* 左边 logo */
+.headerLeft{
+  height: 60px;
+  margin-right: 200px;
+}
+
+.logo {
+  height: 60px;
+}
+
+/* 中间菜单（占满中间空间） */
+.headerCenter {
+  flex: 1;                    /* 自动填充中间的剩余空间 */
+  display: flex;
+  justify-content: space-around;    /* 居中显示菜单 */
+  gap: 20px;                  /* 菜单间隔 */
+}
+
+/* 每个区域的容器 */
+.areaContainer {
+  position: relative;         /* 为绝对定位的子元素提供定位上下文 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 区域名称样式 */
+.areaName {
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s ease;
+  position: relative;           /* 为伪元素提供定位上下文 */
+}
+
+/* 悬停下划线效果 */
+.areaName::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;                  /* 距离文字底部的距离 */
+  left: 50%;
+  transform: translateX(-50%);  /* 居中显示 */
+  width: 0;                     /* 初始宽度为0 */
+  height: 3px;                  /* 下划线高度 */
+  background: #a8c8a8;          /* 下划线颜色 */
+  border-radius: 2px;           /* 边框弧度 */
+  transition: width 0.3s ease; /* 宽度变化的过渡动画 */
+}
+
+.areaName:hover {
+  color: #a8c8a8;
+}
+
+/* 悬停时下划线展开 */
+.areaName:hover::after {
+  width: 80%;                   /* 悬停时下划线宽度 */
+}
+
+/* 透明连接桥梁 */
+.tooltipBridge {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 20px;               /* 桥梁高度，覆盖间隙 */
+  background: transparent;    /* 透明背景 */
+  z-index: 999;              /* 确保在提示框下方 */
+}
+
+/* 动物提示框样式 */
+.animalTooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(3, 18, 3, 0.95);
+  border: 1px solid #4a5c4a;
+  border-radius: 8px;
+  padding: 15px;
+  min-width: 200px;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  color: #fefefe;
+  margin-top: 20px;
+}
+
+.animalTooltip h4 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  color: #ffffff;
+  border-bottom: 1px solid #4a5c4a;
+  padding-bottom: 5px;
+  transition: color 0.2s ease;  /* 添加平滑过渡效果 */
+  cursor: pointer;              /* 添加手掌指针 */
+}
+
+.animalTooltip h4:hover{
+  color: #a8c8a8;
+}
+
+/* 当有动物被悬停时，动物标题的样式 */
+.animalTitleHovered {
+  color: #a8c8a8 !important;
+}
+
+.animalTooltip ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.animalTooltip li {
+  padding: 3px 0;
+  font-size: 16px;
+  color: #e0e0e0;
+  cursor: pointer;              /* 添加手掌指针 */
+  transition: color 0.2s ease; /* 添加平滑过渡效果 */
+}
+
+.animalTooltip li:hover {
+  color: #a8c8a8;
+}
+
+/* 右边 */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;                  /* 按钮/文字间距 */
+  margin-left: 200px;
+}
+
+.allreturn main {
+  flex: 1;                /* 自动填充剩余空间 */
+  padding: 0px 40px;
+  background: linear-gradient(180deg, #f8fdf8 0%, #f0f7f0 100%);
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 10px;
+}
+
+/* 为main添加装饰性背景元素 */
+.allreturn main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(10, 50, 10, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(34, 139, 34, 0.05) 0%, transparent 50%),
+    linear-gradient(45deg, transparent 40%, rgba(10, 50, 10, 0.02) 50%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 确保main内容在背景之上 */
+.allreturn main > * {
+  position: relative;
+  z-index: 1;
+}
+
+.btn {
+  padding: 2px 24px;           /* 增加内边距，从 6px 12px 改为 12px 24px */
+  border: 1px solid #093a4c;
+  background: #065f6d;
+  border-radius: 6px;           /* 增加圆角，从 4px 改为 6px */
+  cursor: pointer;
+  height: 40px;                 /* 增加高度，从 40px 改为 50px */
+  font-size: 20px;              /* 增加字体大小 */
+  font-weight: 500;             /* 增加字体粗细 */
+  color: #ffffff;               /* 设置文字颜色 */
+  transition: all 0.2s ease;   /* 添加过渡效果 */
+}
+
+.btn:hover {
+  background: #087a8a;          /* 悬停时稍微亮一点的背景色 */
+  transform: scale(1.1, 1.1);  /* 悬停时轻微上移效果 */
+}
+
+/* 用户相关样式 */
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.welcomeText {
+  color: #f9f916;
+  font-size: 16px;
+  margin-right: 10px;
+  font-family: fantasy;
+}
+
+.logoutBtn {
+  background: #c53030;
+  border-color: #9c2626;
+}
+
+.logoutBtn:hover {
+  background: #e53e3e;
+}
+
+.allreturn footer {
+  height: auto;
+  min-height: 120px;
+  background: linear-gradient(135deg, #2c5530 0%, #1e3a20 50%, #07520f 100%);
+  padding: 10px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  border-top: 3px solid #4a5c4a;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 10px;
+}
+
+/* Footer内容容器 */
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  position: relative;
+}
+
+/* Footer文字样式 */
+.footerText {
+  color: #e8f5e8;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* 文件上传区域容器 */
+.uploadContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 隐藏默认的文件输入 */
+.fileInput {
+  display: none;
+}
+
+/* 自定义文件上传按钮 */
+.uploadButton {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.uploadButton:hover {
+  background: linear-gradient(135deg, #66bb6a, #4caf50);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.uploadButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+}
+
+/* 上传图标 */
+.uploadIcon {
+  font-size: 18px;
+}
+
+/* 文件信息显示 */
+.fileInfo {
+  color: #c8e6c9;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* Footer底部信息 */
+.footerBottom {
+  margin-top: 0px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  text-align: center;
+}
+
+.footerBottom p {
+  color: #a5c9a5;
+  font-size: 14px;
+  margin: 5px 0;
+  opacity: 0.8;
+}
