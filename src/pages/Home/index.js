@@ -55,7 +55,7 @@ const Home = () => {
                 <header className={styles.header}>
                     <div className={styles.headerLeft}>
                         {/* <img src="/white.webp" alt="Logo" className={styles.logo} /> */}
-                        <img src={`${process.env.PUBLIC_URL}/white.png`} alt="Logo" className={styles.logo} />
+                        <img src={`${process.env.PUBLIC_URL}/white.webp`} alt="Logo" className={styles.logo} />
                     </div>
                     <nav className={styles.headerCenter}>
                         {
