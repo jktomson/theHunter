@@ -154,6 +154,57 @@
   margin-left: 200px;
 }
 
+/* 未登录用户的按钮容器 */
+.headerRight > div:not(.userSection) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.headerRight > div:not(.userSection):hover {
+  transform: translateY(-1px);
+}
+
+/* 注册按钮样式 */
+.headerRight > div:not(.userSection) .btn:first-child {
+  background: linear-gradient(135deg, #d7a030 0%, #f7941c 50%, #a76406 100%);
+  border: 2px solid rgba(246, 228, 33, 0.2);
+  color: #ffffff;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 12px rgba(142, 68, 173, 0.3);
+  transition: all 0.3s ease;
+}
+
+.headerRight > div:not(.userSection) .btn:first-child:hover {
+  background: linear-gradient(135deg, #e16f31 0%, #d05817 50%, #9d370f 100%);
+  border: 2px solid rgba(248, 92, 8, 0.2);
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* 登录按钮样式 */
+.headerRight > div:not(.userSection) .btn:last-child {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f618d 100%);
+  border: 2px solid #3498db;
+  color: #ffffff;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 12px rgba(52, 152, 219, 0.3);
+  transition: all 0.3s ease;
+}
+
+.headerRight > div:not(.userSection) .btn:last-child:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #1f618d 50%, #1a5276 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  border-color: #2980b9;
+}
+
 .allreturn main {
   flex: 1;                /* 自动填充剩余空间 */
   padding: 0px 40px;
@@ -189,24 +240,59 @@
 }
 
 .btn {
-  padding: 2px 24px;           /* 增加内边距，从 6px 12px 改为 12px 24px */
+  padding: 2px 24px;           
   border: 1px solid #0d6b53;
-  /* background: #0e7b32; */
   background: linear-gradient(135deg, #107c1b 0%, #115116 50%, #1e8a29 100%);
-  border-radius: 8px;           /* 增加圆角，从 4px 改为 6px */
+  border-radius: 8px;           
   cursor: pointer;
-  height: 40px;                 /* 增加高度，从 40px 改为 50px */
-  font-size: 20px;              /* 增加字体大小 */
-  font-weight: 500;             /* 增加字体粗细 */
-  color: #ffffff;               /* 设置文字颜色 */
-  transition: all 0.2s ease;   /* 添加过渡效果 */
+  height: 40px;                 
+  font-size: 20px;              
+  font-weight: 500;             
+  color: #ffffff;               
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);   
   margin: 5px;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 4px 15px rgba(16, 124, 27, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.btn:hover {
-  /* background: #087a8a; */
+/* 通用按钮光效 - 仅适用于没有特殊样式的按钮 */
+.btn:not(.headerRight .btn)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.btn:not(.headerRight .btn):hover::before {
+  left: 100%;
+}
+
+.btn:not(.headerRight .btn):hover {
   background: linear-gradient(135deg, #165a1d 0%, #115d18 50%, #125619 100%);
-  transform: scale(1.1, 1.1);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(16, 124, 27, 0.4),
+    0 4px 15px rgba(16, 124, 27, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn:active {
+  transform: translateY(0) scale(1.02);
+  transition: all 0.1s ease;
 }
 
 /* 用户相关样式 */
@@ -214,22 +300,147 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.userSection:hover {
+  transform: translateY(-1px);
 }
 
 .welcomeText {
-  color: #f9f916;
+  color: #ffd700;
   font-size: 16px;
   margin-right: 10px;
-  font-family: fantasy;
+  font-family: 'Microsoft YaHei', sans-serif;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
+.welcomeText:hover {
+  color: #fff8dc;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* 个人中心按钮样式优化 */
+.userSection .btn:first-of-type {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f5f8b 100%);
+  border: 2px solid #2980b9;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.userSection .btn:first-of-type::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.userSection .btn:first-of-type:hover::before {
+  left: 100%;
+}
+
+.userSection .btn:first-of-type:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 50%, #1a4d73 100%);
+  border-color: #2980b9;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(52, 152, 219, 0.4),
+    0 4px 15px rgba(52, 152, 219, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* 退出按钮特殊样式 */
 .logoutBtn {
-  background: #c53030;
-  border-color: #9c2626;
+  position: relative;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #a93226 100%);
+  border: 2px solid #c0392b;
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 退出按钮的渐变光效 */
+.logoutBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+/* 悬停时的光效动画 */
+.logoutBtn:hover::before {
+  left: 100%;
 }
 
 .logoutBtn:hover {
-  background: #e53e3e;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+  border-color: #dc2626;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(231, 76, 60, 0.5),
+    0 4px 15px rgba(231, 76, 60, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* 按下时的效果 */
+.logoutBtn:active {
+  transform: translateY(0) scale(1.02);
+  box-shadow: 
+    0 4px 15px rgba(231, 76, 60, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.1s ease;
+}
+
+/* 退出按钮的脉冲动画效果 */
+@keyframes logoutPulse {
+  0% {
+    box-shadow: 
+      0 4px 15px rgba(231, 76, 60, 0.3),
+      0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+  70% {
+    box-shadow: 
+      0 4px 15px rgba(231, 76, 60, 0.3),
+      0 0 0 10px rgba(231, 76, 60, 0);
+  }
+  100% {
+    box-shadow: 
+      0 4px 15px rgba(231, 76, 60, 0.3),
+      0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
+/* 当用户信息加载完成后，给退出按钮添加轻微的脉冲效果 */
+.logoutBtn:not(:hover) {
+  animation: logoutPulse 3s infinite;
 }
 
 .allreturn footer {
