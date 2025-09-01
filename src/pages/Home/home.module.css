@@ -13,7 +13,8 @@
   justify-content: space-between; /* 左右两端对齐，中间占满 */
   padding: 0 40px;
   height: 80px;
-  background: linear-gradient(135deg, #031203 20%, #010701 80%);;
+  /* background: linear-gradient(135deg, #031203 20%, #010701 80%); */
+  background: linear-gradient(135deg, #104d16 0%, #2d8533 50%, #134e19 100%);
   border-bottom: 1px solid #eee;
   color: #fefefe;
   margin: 20px;
@@ -189,20 +190,23 @@
 
 .btn {
   padding: 2px 24px;           /* 增加内边距，从 6px 12px 改为 12px 24px */
-  border: 1px solid #093a4c;
-  background: #065f6d;
-  border-radius: 6px;           /* 增加圆角，从 4px 改为 6px */
+  border: 1px solid #0d6b53;
+  /* background: #0e7b32; */
+  background: linear-gradient(135deg, #107c1b 0%, #115116 50%, #1e8a29 100%);
+  border-radius: 8px;           /* 增加圆角，从 4px 改为 6px */
   cursor: pointer;
   height: 40px;                 /* 增加高度，从 40px 改为 50px */
   font-size: 20px;              /* 增加字体大小 */
   font-weight: 500;             /* 增加字体粗细 */
   color: #ffffff;               /* 设置文字颜色 */
   transition: all 0.2s ease;   /* 添加过渡效果 */
+  margin: 5px;
 }
 
 .btn:hover {
-  background: #087a8a;          /* 悬停时稍微亮一点的背景色 */
-  transform: scale(1.1, 1.1);  /* 悬停时轻微上移效果 */
+  /* background: #087a8a; */
+  background: linear-gradient(135deg, #165a1d 0%, #115d18 50%, #125619 100%);
+  transform: scale(1.1, 1.1);
 }
 
 /* 用户相关样式 */
