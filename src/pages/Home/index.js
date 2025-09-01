@@ -5,6 +5,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated, selectUser, logout } from '../../store/userSlice';
+import { uploadImage } from '../../utils/api';
 import data from "../../common/data"
 import Dropdowns from '../../components/dropdowns';
 
@@ -13,6 +14,15 @@ const Home = () => {
     const dispatch = useDispatch()
     const [hoveredArea, setHoveredArea] = useState(null)
     const [selectedAnimal, setSelectedAnimal] = useState(null)
+    const [selectedUploadArea, setSelectedUploadArea] = useState(null)
+    const [selectedUploadAnimal, setSelectedUploadAnimal] = useState(null)
+    const [selectedUploadAnimalRating, setSelectedUploadAnimalRating] = useState(null)
+    const [areaDropdownOpen, setAreaDropdownOpen] = useState(false)
+    const [animalDropdownOpen, setAnimalDropdownOpen] = useState(false)
+    const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false)
+    const [showUploadForm, setShowUploadForm] = useState(false)
+    const [isUploading, setIsUploading] = useState(false)
+    
     
     // 从Redux获取用户状态
     const isLoggedIn = useSelector(selectIsAuthenticated)
@@ -32,12 +42,107 @@ const Home = () => {
         const file = event.target.files[0]
         if (file) {
             setSelectedFile(file)
+            setShowUploadForm(true)
+            // 重置选择状态
+            setSelectedUploadArea(null)
+            setSelectedUploadAnimal(null)
+            setSelectedUploadAnimalRating(null)
             console.log('选择的文件:', file.name)
         }
     }
 
     const handleUploadClick = () => {
+        if (!isLoggedIn) {
+            alert('请先登录后再分享图片')
+            navigate('/login')
+            return
+        }
+        
         document.getElementById('fileInput').click()
+    }
+
+    // 验证信息是否完整
+    const isInfoComplete = () => {
+        if (!selectedUploadArea || !selectedUploadAnimal) {
+            return false
+        }
+        // 如果选择的是动物，需要选择评级；如果是风景，不需要评级
+        if (selectedUploadAnimal !== '风景' && !selectedUploadAnimalRating) {
+            return false
+        }
+        return true
+    }
+
+    // 将文件转换为base64
+    const fileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = () => resolve(reader.result)
+            reader.onerror = error => reject(error)
+        })
+    }
+
+    // 处理图片上传
+    const handleImageUpload = async () => {
+        if (!isInfoComplete()) {
+            alert('请完善所有必要信息后再上传')
+            return
+        }
+
+        if (!selectedFile) {
+            alert('请选择图片文件')
+            return
+        }
+
+        setIsUploading(true)
+
+        try {
+            // 将文件转换为base64
+            const imageData = await fileToBase64(selectedFile)
+            
+            // 评级转换为数字（如果是风景则为0）
+            let rating = 0
+            if (selectedUploadAnimal !== '风景') {
+                const ratingMap = {
+                    '无评级': 0,
+                    '青铜': 1,
+                    '白银': 2,
+                    '黄金': 3,
+                    '钻石': 4,
+                    '奇珍异兽': 5
+                }
+                rating = ratingMap[selectedUploadAnimalRating] || 0
+            }
+
+            const uploadData = {
+                imageData: imageData,
+                areaName: selectedUploadArea,
+                animalName: selectedUploadAnimal,
+                rating: rating,
+                uploaderId: user.id,
+                uploaderNickname: user.nickname
+            }
+
+            const response = await uploadImage(uploadData)
+            
+            if (response.code === 200) {
+                // 清空表单
+                setSelectedFile(null)
+                setShowUploadForm(false)
+                setSelectedUploadArea(null)
+                setSelectedUploadAnimal(null)
+                setSelectedUploadAnimalRating(null)
+                // 重置文件输入
+                document.getElementById('fileInput').value = ''
+            }
+
+        } catch (error) {
+            console.error('上传失败:', error)
+            alert('上传失败，请稍后重试')
+        } finally {
+            setIsUploading(false)
+        }
     }
 
     // 监听selectedAnimal的变化，执行相应的导航
@@ -124,9 +229,120 @@ const Home = () => {
                                 className={styles.fileInput}
                             />
                             
-                            {selectedFile && (
-                                <div className={styles.fileInfo}>
-                                    已选择: {selectedFile.name}
+                            {selectedFile && showUploadForm && (
+                                <div className={styles.threeSelectsOut}>
+                                    <div className={styles.fileInfo}>
+                                        已选择: {selectedFile.name}  请完善图片信息：
+                                    </div>
+                                    <div className={styles.threeSelects}>
+                                        <div className={styles.customSelect}>
+                                            <div className={styles.selectTrigger} onClick={() => setAreaDropdownOpen(!areaDropdownOpen)}>
+                                                {selectedUploadArea || '选择区域'}
+                                            </div>
+                                            {areaDropdownOpen && (
+                                                <ul className={styles.selectOptions}>
+                                                    {area.maps.map((map, i) => (
+                                                        <li 
+                                                            key={i} 
+                                                            className={styles.selectOption}
+                                                            onClick={() => {
+                                                                setSelectedUploadArea(map.area);
+                                                                setAreaDropdownOpen(false);
+                                                                setSelectedUploadAnimal(null);
+                                                                setSelectedUploadAnimalRating(null);
+                                                            }}
+                                                        >
+                                                            {map.area}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                        <div className={styles.customSelect}>
+                                            <div className={styles.selectTrigger} onClick={() => setAnimalDropdownOpen(!animalDropdownOpen)}>
+                                                {selectedUploadAnimal || '选择动物或风景'}
+                                            </div>
+                                            {animalDropdownOpen && selectedUploadArea && (
+                                                <ul className={styles.selectOptions}>
+                                                    {area.maps
+                                                        .filter((map) => map.area === selectedUploadArea)
+                                                        .flatMap((map) => map.animals.map((animal, i) => (
+                                                            <li 
+                                                                key={i} 
+                                                                className={styles.selectOption}
+                                                                onClick={() => {
+                                                                    setSelectedUploadAnimal(animal.name);
+                                                                    setAnimalDropdownOpen(false);
+                                                                    setSelectedUploadAnimalRating(null);
+                                                                }}
+                                                            >
+                                                                {animal.name}
+                                                            </li>
+                                                        )))
+                                                    }
+                                                    <li 
+                                                        key="landscape" 
+                                                        className={styles.selectOption}
+                                                        onClick={() => {
+                                                            setSelectedUploadAnimal('风景');
+                                                            setAnimalDropdownOpen(false);
+                                                            setSelectedUploadAnimalRating('风景');
+                                                        }}
+                                                    >
+                                                        风景
+                                                    </li>
+                                                </ul>
+                                            )}
+                                        </div>
+                                        <div className={styles.customSelect}>
+                                            <div className={styles.selectTrigger} onClick={() => setRatingDropdownOpen(!ratingDropdownOpen)}>
+                                                {selectedUploadAnimal === '风景' ? '风景' : (selectedUploadAnimalRating || '选择评级')}
+                                            </div>
+                                            {ratingDropdownOpen && selectedUploadAnimal && selectedUploadAnimal !== '风景' && (
+                                                <ul className={styles.selectOptions}>
+                                                    {
+                                                        ['无评级', '青铜', '白银', '黄金', '钻石', '奇珍异兽'].map((rating, i) => (
+                                                            <li 
+                                                                key={i} 
+                                                                className={styles.selectOption}
+                                                                onClick={() => {
+                                                                    setSelectedUploadAnimalRating(rating);
+                                                                    setRatingDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                {rating}
+                                                            </li>
+                                                        ))
+                                                    }
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 上传按钮和操作区域 */}
+                                    <div className={styles.uploadActions}>
+                                        <button 
+                                            className={`${styles.uploadButton} ${styles.finalUploadBtn}`}
+                                            onClick={handleImageUpload}
+                                            disabled={!isInfoComplete() || isUploading}
+                                        >
+                                            {isUploading ? '上传中...' : '上传图片'}
+                                        </button>
+                                        <button 
+                                            className={`${styles.uploadButton} ${styles.cancelBtn}`}
+                                            onClick={() => {
+                                                setSelectedFile(null);
+                                                setShowUploadForm(false);
+                                                setSelectedUploadArea(null);
+                                                setSelectedUploadAnimal(null);
+                                                setSelectedUploadAnimalRating(null);
+                                                document.getElementById('fileInput').value = '';
+                                            }}
+                                            disabled={isUploading}
+                                        >
+                                            取消
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>

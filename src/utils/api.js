@@ -80,6 +80,30 @@ export const loginUser = async (loginData) => {
   }
 }
 
+export const uploadImage = async (loadImageData) => {
+  const {imageData, areaName, animalName, rating, uploaderId, uploaderNickname} = loadImageData
+
+  try {
+    const response = await request('/uploadImage', {
+      method: 'POST', 
+      body: {
+        imageData: imageData,
+        areaName: areaName,
+        animalName: animalName,
+        rating: rating,
+        uploaderId: uploaderId,
+        uploaderNickname: uploaderNickname
+      }
+    })
+    if (response.code === 200) {
+      alert('图片分享成功');
+    }
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
 // 用户登出
 export const logoutUser = () => {
   localStorage.removeItem('token')
@@ -110,7 +134,7 @@ export const getCurrentUser = () => {
     console.error('获取用户信息失败:', error)
     logoutUser()
     return null
-  }
+  } 
 }
 
 // 检查用户是否已登录
