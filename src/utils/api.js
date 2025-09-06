@@ -154,11 +154,11 @@ export const getLandscapeImages = async (filters = {}) => {
     const response = await request('/getLandscapeImages', {
       method: 'POST',
       body: {
-        areaName: filters.areaName || '',
+        page: filters.page || 1,
+        timestamp: filters.timestamp || null,
         sortBy: filters.sortBy || 'uploadTime',
         sortOrder: filters.sortOrder || 'desc',
-        page: filters.page || 1,
-        limit: filters.limit || 20
+        limit: filters.limit || 12
       }
     })
 
@@ -175,13 +175,13 @@ export const getTrophyImages = async (filters = {}) => {
     const response = await request('/getTrophyImages', {
       method: 'POST',
       body: {
-        areaName: filters.areaName || '',
+        page: filters.page || 1,
+        timestamp: filters.timestamp || null,
         animalName: filters.animalName || '',
         rating: filters.rating || null,
         sortBy: filters.sortBy || 'uploadTime',
         sortOrder: filters.sortOrder || 'desc',
-        page: filters.page || 1,
-        limit: filters.limit || 20
+        limit: filters.limit || 12
       }
     })
 

@@ -5,13 +5,13 @@ export default async function (ctx: FunctionContext) {
   try {
     // 获取请求参数
     const { 
-      areaName,           // 区域名称（可选）
       animalName,         // 动物名称（可选）
       rating,             // 评级筛选（可选）
       page = 1,           // 页码，默认第1页
-      limit = 20,         // 每页数量，默认20条
+      limit = 12,         // 每页数量，默认12条
       sortBy = 'uploadTime', // 排序字段
-      sortOrder = 'desc'  // 排序方向
+      sortOrder = 'desc',  // 排序方向
+      timestamp = null    // 查询时间戳，用于保证分页一致性
     } = ctx.body
 
     // 参数验证
@@ -41,10 +41,6 @@ export default async function (ctx: FunctionContext) {
     }
 
     // 添加可选筛选条件
-    if (areaName) {
-      whereConditions.areaName = areaName.trim()
-    }
-
     if (animalName) {
       whereConditions.animalName = animalName.trim()
     }
@@ -53,19 +49,26 @@ export default async function (ctx: FunctionContext) {
       whereConditions.rating = rating
     }
 
+    // 如果提供了时间戳，只查询在该时间点之前上传的图片
+    if (timestamp) {
+      whereConditions.uploadTime = db.command.lte(new Date(timestamp))
+    }
+
     // 构建排序条件
     let sortField = 'uploadTime'
-    let sortDirection = -1 // 默认降序
+    let sortDirection = 'desc'
     
     if (sortBy === 'uploadTime' || sortBy === 'viewCount' || sortBy === 'likeCount' || sortBy === 'rating') {
       sortField = sortBy
-      sortDirection = sortOrder === 'asc' ? 1 : -1
+      sortDirection = sortOrder === 'asc' ? 'asc' : 'desc'
     }
 
     // 计算跳过的记录数
     const skip = (page - 1) * limit
 
-    // 查询奖杯图片列表（包含完整的图片数据用于瀑布流展示）
+    console.log('查询条件:', { whereConditions, sortField, sortDirection, skip, limit })
+
+    // 查询奖杯图片列表
     const imagesQuery = await db.collection('images')
       .where(whereConditions)
       .field({
@@ -76,30 +79,32 @@ export default async function (ctx: FunctionContext) {
         uploaderId: true,
         uploaderNickname: true,
         description: true,
-        imageData: true,        // 包含图片数据
+        imageData: true,
         uploadTime: true,
         viewCount: true,
         likeCount: true,
         fileSize: true,
         imageType: true
       })
-      .orderBy(sortField, sortDirection === 1 ? 'asc' : 'desc')
+      .orderBy(sortField, sortDirection)
+      .orderBy('_id', 'desc') // 辅助排序确保一致性
       .skip(skip)
-      .limit(limit)
+      .limit(limit + 1) // 多查询一条用于判断是否有下一页
       .get()
 
-    // 获取总数
-    const countQuery = await db.collection('images')
-      .where(whereConditions)
-      .count()
-
     const images = imagesQuery.data || []
-    const total = countQuery.total || 0
+    console.log(`查询到 ${images.length} 条记录，limit=${limit}`)
 
-    // 计算分页信息
-    const totalPages = Math.ceil(total / limit)
-    const hasNextPage = page < totalPages
-    const hasPrevPage = page > 1
+    // 判断是否有下一页
+    const hasNextPage = images.length > limit
+    if (hasNextPage) {
+      images.pop() // 移除多查询的那一条
+    }
+
+    console.log(`处理后 ${images.length} 条记录，hasNextPage=${hasNextPage}`)
+
+    // 获取查询时间戳（用于后续分页保持一致性）
+    const queryTimestamp = timestamp || new Date().toISOString()
 
     // 评级文本映射
     const getRatingText = (rating: number) => {
@@ -147,7 +152,7 @@ export default async function (ctx: FunctionContext) {
       }
     })
 
-    console.log(`奖杯图片查询成功: 区域=${areaName || '全部'}, 动物=${animalName || '全部'}, 评级=${rating ?? '全部'}, 第${page}页，共${total}条记录`)
+    console.log(`奖杯图片查询成功: 动物=${animalName || '全部'}, 评级=${rating ?? '全部'}, 第${page}页，返回${formattedImages.length}条记录，hasNextPage=${hasNextPage}`)
 
     return {
       code: 200,
@@ -156,14 +161,11 @@ export default async function (ctx: FunctionContext) {
         images: formattedImages,
         pagination: {
           currentPage: page,
-          totalPages: totalPages,
-          totalItems: total,
-          itemsPerPage: limit,
           hasNextPage: hasNextPage,
-          hasPrevPage: hasPrevPage
+          itemsPerPage: limit,
+          timestamp: queryTimestamp // 传递时间戳给前端
         },
         filters: {
-          areaName: areaName || null,
           animalName: animalName || null,
           rating: rating ?? null,
           sortBy: sortBy,

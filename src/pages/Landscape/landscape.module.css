@@ -78,41 +78,36 @@
   transform: translateY(-1px);
 }
 
-/* 瀑布流容器 */
+/* 瀑布流容器 - 使用grid实现真正的瀑布流 */
 .waterfallContainer {
-  columns: 4;
-  column-gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
   padding: 0;
-}
-
-@media (max-width: 1200px) {
-  .waterfallContainer {
-    columns: 3;
-  }
 }
 
 @media (max-width: 900px) {
   .waterfallContainer {
-    columns: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
   .waterfallContainer {
-    columns: 1;
+    grid-template-columns: 1fr;
   }
 }
 
 /* 瀑布流项目 */
 .waterfallItem {
-  break-inside: avoid;
-  margin-bottom: 20px;
+  width: 100%; /* Grid会自动处理宽度 */
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
+  break-inside: avoid; /* 防止在列内分页时断裂 */
 }
 
 .waterfallItem:hover {

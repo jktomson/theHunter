@@ -8,8 +8,8 @@ const Landscape = () => {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [timestamp, setTimestamp] = useState(null); // 查询时间戳
   const [filters, setFilters] = useState({
-    areaName: '',
     sortBy: 'uploadTime',
     sortOrder: 'desc'
   });
@@ -35,13 +35,15 @@ const Landscape = () => {
       console.log('正在获取风景图片，参数:', {
         ...filters,
         page: pageNum,
-        limit: 20
+        timestamp: timestamp,
+        limit: 12
       });
       
       const response = await getLandscapeImages({
         ...filters,
         page: pageNum,
-        limit: 20
+        timestamp: timestamp, // 传递时间戳保证分页一致性
+        limit: 12
       });
       
       console.log('获取风景图片响应:', response);
@@ -51,8 +53,16 @@ const Landscape = () => {
         
         if (resetList) {
           setImages(newImages);
+          // 保存查询时间戳，后续分页使用
+          setTimestamp(response.data.pagination.timestamp);
+          console.log('重置图片列表，新列表长度:', newImages.length);
         } else {
-          setImages(prev => [...prev, ...newImages]);
+          setImages(prev => {
+            const combined = [...prev, ...newImages];
+            console.log('追加图片，之前:', prev.length, '新增:', newImages.length, '总计:', combined.length);
+            // 添加索引标记来验证顺序
+            return combined.map((img, index) => ({ ...img, loadOrder: index }));
+          });
         }
         
         setHasMore(response.data.pagination.hasNextPage);
@@ -80,6 +90,7 @@ const Landscape = () => {
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
     setPage(1);
+    setTimestamp(null); // 重置时间戳
     setImages([]);
     setHasMore(true);
   };
@@ -132,23 +143,6 @@ const Landscape = () => {
       {/* 筛选栏 */}
       <div className={styles.filterBar}>
         <div className={styles.filterGroup}>
-          <label htmlFor="area-select">狩猎区域:</label>
-          <select 
-            id="area-select"
-            value={filters.areaName} 
-            onChange={(e) => handleFilterChange({ areaName: e.target.value })}
-            className={styles.filterSelect}
-          >
-            <option value="">全部区域</option>
-            <option value="阿拉斯加">阿拉斯加</option>
-            <option value="非洲草原">非洲草原</option>
-            <option value="欧洲森林">欧洲森林</option>
-            <option value="北美森林">北美森林</option>
-            <option value="亚洲高原">亚洲高原</option>
-          </select>
-        </div>
-
-        <div className={styles.filterGroup}>
           <label htmlFor="sort-select">排序方式:</label>
           <select 
             id="sort-select"
@@ -179,9 +173,10 @@ const Landscape = () => {
       <div className={styles.waterfallContainer}>
         {images.map((image, index) => (
           <div 
-            key={image.id}
+            key={`${image.id}-${image.loadOrder || index}`} // 使用复合key确保唯一性
             ref={index === images.length - 1 ? lastImageElementRef : null}
             className={styles.waterfallItem}
+            style={{ order: image.loadOrder || index }} // 确保顺序
           >
             <div className={styles.imageWrapper}>
               <img 
@@ -192,6 +187,7 @@ const Landscape = () => {
                 onError={(e) => {
                   console.error('图片加载失败:', {
                     id: image.id,
+                    loadOrder: image.loadOrder,
                     imageType: image.imageType,
                     imageDataLength: image.imageData?.length,
                     imageDataStart: image.imageData?.substring(0, 50)
