@@ -147,3 +147,47 @@ export const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
   return token ? { 'Authorization': `Bearer ${token}` } : {}
 }
+
+// 获取风景图片
+export const getLandscapeImages = async (filters = {}) => {
+  try {
+    const response = await request('/getLandscapeImages', {
+      method: 'POST',
+      body: {
+        areaName: filters.areaName || '',
+        sortBy: filters.sortBy || 'uploadTime',
+        sortOrder: filters.sortOrder || 'desc',
+        page: filters.page || 1,
+        limit: filters.limit || 20
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.error('获取风景图片失败:', error)
+    throw error
+  }
+}
+
+// 获取奖杯图片
+export const getTrophyImages = async (filters = {}) => {
+  try {
+    const response = await request('/getTrophyImages', {
+      method: 'POST',
+      body: {
+        areaName: filters.areaName || '',
+        animalName: filters.animalName || '',
+        rating: filters.rating || null,
+        sortBy: filters.sortBy || 'uploadTime',
+        sortOrder: filters.sortOrder || 'desc',
+        page: filters.page || 1,
+        limit: filters.limit || 20
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.error('获取奖杯图片失败:', error)
+    throw error
+  }
+}

@@ -1,0 +1,133 @@
+import cloud from '@lafjs/cloud'
+import { FunctionContext } from './types'
+
+export default async function (ctx: FunctionContext) {
+  try {
+    // 获取请求参数
+    const { 
+      areaName,           // 区域名称（可选）
+      page = 1,           // 页码，默认第1页
+      limit = 20,         // 每页数量，默认20条
+      sortBy = 'uploadTime', // 排序字段
+      sortOrder = 'desc'  // 排序方向
+    } = ctx.body
+
+    // 参数验证
+    if (page < 1 || limit < 1 || limit > 50) {
+      return {
+        code: 400,
+        message: '页码必须大于0，每页数量必须在1-50之间',
+        data: null
+      }
+    }
+
+    // 获取数据库连接
+    const db = cloud.database()
+
+    // 构建查询条件 - 只查询风景图片
+    const whereConditions: any = {
+      isActive: true,
+      animalName: '风景'  // 筛选风景图片
+    }
+
+    // 如果指定了区域，添加区域筛选
+    if (areaName) {
+      whereConditions.areaName = areaName.trim()
+    }
+
+    // 构建排序条件
+    let sortField = 'uploadTime'
+    let sortDirection = -1 // 默认降序
+    
+    if (sortBy === 'uploadTime' || sortBy === 'viewCount' || sortBy === 'likeCount') {
+      sortField = sortBy
+      sortDirection = sortOrder === 'asc' ? 1 : -1
+    }
+
+    // 计算跳过的记录数
+    const skip = (page - 1) * limit
+
+    // 查询风景图片列表（包含完整的图片数据用于瀑布流展示）
+    const imagesQuery = await db.collection('images')
+      .where(whereConditions)
+      .field({
+        _id: true,
+        areaName: true,
+        animalName: true,
+        uploaderId: true,
+        uploaderNickname: true,
+        description: true,
+        imageData: true,        // 包含图片数据
+        uploadTime: true,
+        viewCount: true,
+        likeCount: true,
+        fileSize: true,
+        imageType: true
+      })
+      .orderBy(sortField, sortDirection === 1 ? 'asc' : 'desc')
+      .skip(skip)
+      .limit(limit)
+      .get()
+
+    // 获取总数
+    const countQuery = await db.collection('images')
+      .where(whereConditions)
+      .count()
+
+    const images = imagesQuery.data || []
+    const total = countQuery.total || 0
+
+    // 计算分页信息
+    const totalPages = Math.ceil(total / limit)
+    const hasNextPage = page < totalPages
+    const hasPrevPage = page > 1
+
+    // 格式化返回数据
+    const formattedImages = images.map(image => ({
+      id: image._id,
+      areaName: image.areaName,
+      animalName: image.animalName,
+      uploaderId: image.uploaderId,
+      uploaderNickname: image.uploaderNickname,
+      description: image.description || '',
+      imageData: image.imageData,
+      uploadTime: image.uploadTime,
+      viewCount: image.viewCount || 0,
+      likeCount: image.likeCount || 0,
+      fileSize: image.fileSize,
+      imageType: image.imageType
+    }))
+
+    console.log(`风景图片查询成功: 区域=${areaName || '全部'}, 第${page}页，共${total}条记录`)
+
+    return {
+      code: 200,
+      message: '查询成功',
+      data: {
+        images: formattedImages,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: hasNextPage,
+          hasPrevPage: hasPrevPage
+        },
+        filters: {
+          areaName: areaName || null,
+          animalName: '风景',
+          sortBy: sortBy,
+          sortOrder: sortOrder
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error('获取风景图片失败:', error)
+    return {
+      code: 500,
+      message: '服务器内部错误',
+      data: null
+    }
+  }
+}

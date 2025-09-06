@@ -1,4 +1,5 @@
 import cloud from '@lafjs/cloud'
+import { FunctionContext } from './types'
 
 export default async function (ctx: FunctionContext) {
   try {

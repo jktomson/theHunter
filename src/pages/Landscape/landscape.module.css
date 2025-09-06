@@ -1,0 +1,331 @@
+/* 风景页面瀑布流布局 */
+.landscapeContainer {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 筛选栏 */
+.filterBar {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filterGroup label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.filterSelect {
+  padding: 10px 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filterSelect:hover {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+/* 错误提示 */
+.errorMessage {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.errorMessage button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.errorMessage button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 瀑布流容器 */
+.waterfallContainer {
+  columns: 4;
+  column-gap: 20px;
+  padding: 0;
+}
+
+@media (max-width: 1200px) {
+  .waterfallContainer {
+    columns: 3;
+  }
+}
+
+@media (max-width: 900px) {
+  .waterfallContainer {
+    columns: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .waterfallContainer {
+    columns: 1;
+  }
+}
+
+/* 瀑布流项目 */
+.waterfallItem {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.waterfallItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 图片容器 */
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.landscapeImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.waterfallItem:hover .landscapeImage {
+  transform: scale(1.05);
+}
+
+/* 图片覆盖层 */
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 15px;
+}
+
+.waterfallItem:hover .imageOverlay {
+  opacity: 1;
+}
+
+.imageStats {
+  display: flex;
+  gap: 15px;
+  margin-left: auto;
+}
+
+.viewCount,
+.likeCount {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+/* 图片信息区域 */
+.imageInfo {
+  padding: 15px;
+}
+
+.imageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.imageTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #28a745;
+  flex: 1;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.imageDescription {
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.imageFooter {
+  border-top: 1px solid #e9ecef;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.uploaderInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.uploaderName {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.uploadTime {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* 加载状态 */
+.loadingContainer {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e9ecef;
+  border-top: 3px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 没有更多数据 */
+.noMoreData {
+  text-align: center;
+  padding: 30px 20px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* 空状态 */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.emptyState h3 {
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.emptyState p {
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .landscapeContainer {
+    padding: 15px;
+  }
+  
+  .filterBar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .filterGroup {
+    min-width: auto;
+  }
+  
+  .imageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .fileSize {
+    margin-left: 0;
+  }
+  
+  .uploaderInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}

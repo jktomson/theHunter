@@ -8,12 +8,16 @@ import { selectIsAuthenticated, selectUser, logout } from '../../store/userSlice
 import { uploadImage } from '../../utils/api';
 import data from "../../common/data"
 import Dropdowns from '../../components/dropdowns';
+import Landscape from '../Landscape/landscape';
+import Trophy from '../Trophy/trophy';
 
 const Home = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [hoveredArea, setHoveredArea] = useState(null)
     const [selectedAnimal, setSelectedAnimal] = useState(null)
+    const [selectedArea, setSelectedArea] = useState(null)
+    const [currentView, setCurrentView] = useState('default') // 'default', 'landscape', 'trophy'
     const [selectedUploadArea, setSelectedUploadArea] = useState(null)
     const [selectedUploadAnimal, setSelectedUploadAnimal] = useState(null)
     const [selectedUploadAnimalRating, setSelectedUploadAnimalRating] = useState(null)
@@ -145,14 +149,59 @@ const Home = () => {
         }
     }
 
-    // 监听selectedAnimal的变化，执行相应的导航
+    // 处理动物或风景选择
+    const handleAnimalSelection = (animalName, areaData) => {
+        setSelectedAnimal(animalName)
+        setSelectedArea(areaData)
+        
+        if (animalName === '风景') {
+            setCurrentView('landscape')
+        } else {
+            setCurrentView('trophy')
+        }
+    }
+
+    // 监听selectedAnimal的变化，更新视图
     useEffect(() => {
         if (selectedAnimal === '风景') {
-            navigate('/home')
+            setCurrentView('landscape')
         } else if (selectedAnimal && selectedAnimal !== '风景') {
-            navigate('trophy')
+            setCurrentView('trophy')
         }
-    }, [selectedAnimal, navigate])
+    }, [selectedAnimal])
+
+    // 渲染主内容区域
+    const renderMainContent = () => {
+        switch (currentView) {
+            case 'landscape':
+                return <Landscape selectedArea={selectedArea} />
+            case 'trophy':
+                return <Trophy selectedAnimal={selectedAnimal} selectedArea={selectedArea} />
+            default:
+                return (
+                    <div className={styles.defaultContent}>
+                        <div className={styles.welcomeSection}>
+                            <h2>🌲 欢迎来到猎人传说 🦌</h2>
+                            <p>选择上方菜单中的区域和动物，探索精彩的狩猎世界</p>
+                            <div className={styles.featureGrid}>
+                                <div className={styles.featureCard}>
+                                    <h3>🏞️ 风景欣赏</h3>
+                                    <p>浏览各个区域的绝美风景，感受大自然的魅力</p>
+                                </div>
+                                <div className={styles.featureCard}>
+                                    <h3>🏆 动物奖杯</h3>
+                                    <p>查看各种动物的详细信息和狩猎记录</p>
+                                </div>
+                                <div className={styles.featureCard}>
+                                    <h3>📸 分享时刻</h3>
+                                    <p>上传你的狩猎照片，与其他猎人分享精彩瞬间</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+        }
+    }
 
     return (
         <>
@@ -171,7 +220,7 @@ const Home = () => {
                                     i={i} 
                                     hoveredArea={hoveredArea}
                                     setHoveredArea={setHoveredArea}
-                                    setSelectedAnimal={setSelectedAnimal}
+                                    setSelectedAnimal={handleAnimalSelection}
                                 />
                             ))
                         }
@@ -206,7 +255,7 @@ const Home = () => {
                     </div>
                 </header>
                 <main>
-                    <Outlet></Outlet>
+                    {renderMainContent()}
                 </main>
                 <footer>
                     <div className={styles.footerContent}>

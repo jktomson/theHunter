@@ -27,13 +27,13 @@ function Dropdowns({ map, i, hoveredArea, setHoveredArea, setSelectedAnimal }) {
                                     key={index}
                                     onMouseEnter={() => setHoveredAnimal(animal.name)}
                                     onMouseLeave={() => setHoveredAnimal(null)}
-                                    onClick={() => setSelectedAnimal(animal.name)}
+                                    onClick={() => setSelectedAnimal(animal.name, map)}
                                 >
                                     {animal.name}
                                 </li>
                             ))}
                         </ul>
-                        <h4 onClick={() => setSelectedAnimal('风景')}>风景</h4>
+                        <h4 onClick={() => setSelectedAnimal('风景', map)}>风景</h4>
                     </div>
                 </div>
             )}

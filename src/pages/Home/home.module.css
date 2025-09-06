@@ -713,3 +713,60 @@
   box-shadow: none !important;
   opacity: 0.6;
 }
+
+/* 默认主内容样式 */
+.defaultContent {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.welcomeSection h2 {
+  color: #2e7d32;
+  font-size: 32px;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcomeSection p {
+  color: #666;
+  font-size: 18px;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e8 100%);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.1);
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  transition: all 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(46, 125, 50, 0.15);
+}
+
+.featureCard h3 {
+  color: #1b5e20;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.featureCard p {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
