@@ -6,6 +6,7 @@ export default async function (ctx: FunctionContext) {
     // 获取请求参数
     const { 
       animalName,         // 动物名称（可选）
+      areaName,           // 区域名称（可选）
       rating,             // 评级筛选（可选）
       page = 1,           // 页码，默认第1页
       limit = 12,         // 每页数量，默认12条
@@ -23,7 +24,7 @@ export default async function (ctx: FunctionContext) {
       }
     }
 
-    if (rating && (rating < 0 || rating > 5)) {
+    if (rating !== undefined && rating !== null && (rating < 0 || rating > 5)) {
       return {
         code: 400,
         message: '评级必须在0-5之间',
@@ -43,6 +44,10 @@ export default async function (ctx: FunctionContext) {
     // 添加可选筛选条件
     if (animalName) {
       whereConditions.animalName = animalName.trim()
+    }
+
+    if (areaName) {
+      whereConditions.areaName = areaName.trim()
     }
 
     if (rating !== undefined && rating !== null) {
@@ -66,7 +71,15 @@ export default async function (ctx: FunctionContext) {
     // 计算跳过的记录数
     const skip = (page - 1) * limit
 
-    console.log('查询条件:', { whereConditions, sortField, sortDirection, skip, limit })
+    console.log('奖杯查询条件:', { 
+      whereConditions, 
+      sortField, 
+      sortDirection, 
+      skip, 
+      limit,
+      originalRating: rating,
+      ratingType: typeof rating
+    })
 
     // 查询奖杯图片列表
     const imagesQuery = await db.collection('images')
@@ -152,7 +165,7 @@ export default async function (ctx: FunctionContext) {
       }
     })
 
-    console.log(`奖杯图片查询成功: 动物=${animalName || '全部'}, 评级=${rating ?? '全部'}, 第${page}页，返回${formattedImages.length}条记录，hasNextPage=${hasNextPage}`)
+    console.log(`奖杯图片查询成功: 区域=${areaName || '全部'}, 动物=${animalName || '全部'}, 评级=${rating ?? '全部'}, 第${page}页，返回${formattedImages.length}条记录，hasNextPage=${hasNextPage}`)
 
     return {
       code: 200,
@@ -166,6 +179,7 @@ export default async function (ctx: FunctionContext) {
           timestamp: queryTimestamp // 传递时间戳给前端
         },
         filters: {
+          areaName: areaName || null,
           animalName: animalName || null,
           rating: rating ?? null,
           sortBy: sortBy,

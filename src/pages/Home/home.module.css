@@ -20,6 +20,9 @@
   margin: 20px;
   border-radius: 10px;
   font-size: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 /* 左边 logo */
@@ -442,7 +445,7 @@
 
 .allreturn footer {
   height: auto;
-  min-height: 120px;
+  min-height: 100px;
   background: linear-gradient(135deg, #2c5530 0%, #1e3a20 50%, #07520f 100%);
   padding: 10px 40px;
   display: flex;
@@ -457,6 +460,9 @@
   margin-left: 20px;
   margin-right: 20px;
   border-radius: 10px;
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
 }
 
 /* Footer内容容器 */
@@ -472,10 +478,10 @@
 /* Footer文字样式 */
 .footerText {
   color: #e8f5e8;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   text-align: center;
-  margin: 0;
+  margin: 0px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
 }
@@ -485,7 +491,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 /* 隐藏默认的文件输入 */
@@ -498,10 +504,10 @@
   background: linear-gradient(135deg, #4caf50, #388e3c);
   color: white;
   border: none;
-  padding: 12px 30px;
+  padding: 8px 20px;
   border-radius: 25px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
@@ -525,7 +531,7 @@
 
 /* 上传图标 */
 .uploadIcon {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* 文件信息显示 */
@@ -547,9 +553,55 @@
 
 .footerBottom p {
   color: #a5c9a5;
-  font-size: 14px;
-  margin: 5px 0;
+  font-size: 12px;
+  margin: 2px 0;
   opacity: 0.8;
+}
+
+/* Footer切换按钮 */
+.footerToggle {
+  position: absolute;
+  top: 4px;
+  right: 45%;
+  transform: translateX(50%);
+  background: linear-gradient(135deg, #2c5530 0%, #1e3a20 50%, #07520f 100%);
+  border: 2px solid #4a5c4a;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 101;
+}
+
+.footerToggle:hover {
+  background: linear-gradient(135deg, #3a6840 0%, #2d4a30 50%, #0a6317 100%);
+  transform: translateX(50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.arrowDown, .arrowUp {
+  color: #a5c9a5;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.footerToggle:hover .arrowDown,
+.footerToggle:hover .arrowUp {
+  color: #ffffff;
+}
+
+/* Footer收起状态 */
+.footerCollapsed {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden;
 }
 
 .threeSelectsOut {

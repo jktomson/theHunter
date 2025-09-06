@@ -1,7 +1,7 @@
 import '../../common/global.css';
 import styles from './home.module.css';
 
-import { Outlet, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated, selectUser, logout } from '../../store/userSlice';
@@ -26,6 +26,7 @@ const Home = () => {
     const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false)
     const [showUploadForm, setShowUploadForm] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
+    const [isFooterCollapsed, setIsFooterCollapsed] = useState(false) // footer收起状态
     
     
     // 从Redux获取用户状态
@@ -38,6 +39,11 @@ const Home = () => {
         if (window.confirm('确定要退出登录吗？')) {
             dispatch(logout())
         }
+    }
+
+    // 切换footer显示状态
+    const toggleFooter = () => {
+        setIsFooterCollapsed(!isFooterCollapsed)
     }
 
     const [selectedFile, setSelectedFile] = useState(null)
@@ -254,14 +260,37 @@ const Home = () => {
                         )}
                     </div>
                 </header>
-                <main>
+                <main className={styles.threeColumns}>
                     {renderMainContent()}
+                    {/* <div className={styles.leftColumn}>
+                        <img src={`${process.env.PUBLIC_URL}/left.png`} alt="Left Side" className={styles.sideImage} />
+                    </div>
+                    <div className={styles.centerColumn}>
+                        {renderMainContent()}
+                    </div>
+                    <div className={styles.rightColumn}>
+                        <img src={`${process.env.PUBLIC_URL}/right.png`} alt="Right Side" className={styles.sideImage} />
+                    </div> */}
                 </main>
-                <footer>
-                    <div className={styles.footerContent}>
-                        <h3 className={styles.footerText}>分享你的狩猎瞬间</h3>
-                        
-                        <div className={styles.uploadContainer}>
+                <footer className={isFooterCollapsed ? styles.footerCollapsed : ''}>
+                    {/* 箭头按钮 */}
+                    <button 
+                        className={styles.footerToggle}
+                        onClick={toggleFooter}
+                        title={isFooterCollapsed ? '展开底部' : '收起底部'}
+                    >
+                        <span className={isFooterCollapsed ? styles.arrowUp : styles.arrowDown}>
+                            {isFooterCollapsed ? '▲' : '▼'}
+                        </span>
+                    </button>
+                    
+                    {/* footer内容 - 只在未收起时显示 */}
+                    {!isFooterCollapsed && (
+                        <>
+                            <div className={styles.footerContent}>
+                                <h3 className={styles.footerText}>分享你的狩猎瞬间</h3>
+                                
+                                <div className={styles.uploadContainer}>
                             <button 
                                 className={styles.uploadButton}
                                 onClick={handleUploadClick}
@@ -401,6 +430,8 @@ const Home = () => {
                         <p>© 2025 猎人传说 - 与自然共舞的狩猎体验</p>
                         <p>🌲 探索 · 发现 · 分享 🦌</p>
                     </div>
+                        </>
+                    )}
                 </footer>
             </div>
         </>

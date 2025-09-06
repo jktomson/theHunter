@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './landscape.module.css';
 import { getLandscapeImages } from '../../utils/api';
 
-const Landscape = () => {
+const Landscape = ({ selectedArea }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -10,6 +10,7 @@ const Landscape = () => {
   const [page, setPage] = useState(1);
   const [timestamp, setTimestamp] = useState(null); // 查询时间戳
   const [filters, setFilters] = useState({
+    areaName: selectedArea?.area || '',
     sortBy: 'uploadTime',
     sortOrder: 'desc'
   });
@@ -99,6 +100,20 @@ const Landscape = () => {
   useEffect(() => {
     fetchLandscapeImages(1, true);
   }, [filters]);
+
+  // 监听props变化，更新filters
+  useEffect(() => {
+    if (selectedArea) {
+      setFilters(prev => ({
+        ...prev,
+        areaName: selectedArea.area || ''
+      }));
+      setPage(1);
+      setTimestamp(null);
+      setImages([]);
+      setHasMore(true);
+    }
+  }, [selectedArea]);
 
   // 验证和修复base64数据
   const validateBase64Image = (imageData, imageType) => {

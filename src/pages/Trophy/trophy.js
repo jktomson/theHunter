@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './trophy.module.css';
 import { getTrophyImages } from '../../utils/api';
 
-const Trophy = () => {
+const Trophy = ({ selectedAnimal, selectedArea }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -10,31 +10,22 @@ const Trophy = () => {
   const [page, setPage] = useState(1);
   const [timestamp, setTimestamp] = useState(null); // 查询时间戳
   const [filters, setFilters] = useState({
-    animalName: '',
+    animalName: selectedAnimal || '',
+    areaName: selectedArea?.area || '',
     rating: null,
     sortBy: 'uploadTime',
     sortOrder: 'desc'
   });
 
   const observer = useRef();
-  const lastImageElementRef = useCallback(node => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMoreImages();
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
 
-  // 获取奖杯图片
+  // 获取战利品图片
   const fetchTrophyImages = async (pageNum = 1, resetList = false) => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log('正在获取奖杯图片，参数:', {
+      console.log('正在获取战利品图片，参数:', {
         ...filters,
         page: pageNum,
         timestamp: timestamp,
@@ -48,7 +39,7 @@ const Trophy = () => {
         limit: 12
       });
       
-      console.log('获取奖杯图片响应:', response);
+      console.log('获取战利品图片响应:', response);
       
       if (response.code === 200) {
         const newImages = response.data.images || [];
@@ -57,11 +48,11 @@ const Trophy = () => {
           setImages(newImages);
           // 保存查询时间戳，后续分页使用
           setTimestamp(response.data.pagination.timestamp);
-          console.log('重置奖杯列表，新列表长度:', newImages.length);
+          console.log('重置战利品列表，新列表长度:', newImages.length);
         } else {
           setImages(prev => {
             const combined = [...prev, ...newImages];
-            console.log('追加奖杯，之前:', prev.length, '新增:', newImages.length, '总计:', combined.length);
+            console.log('追加战利品，之前:', prev.length, '新增:', newImages.length, '总计:', combined.length);
             // 添加索引标记来验证顺序
             return combined.map((img, index) => ({ ...img, loadOrder: index }));
           });
@@ -74,7 +65,7 @@ const Trophy = () => {
         setError(response.message || '获取图片失败');
       }
     } catch (error) {
-      console.error('获取奖杯图片失败:', error);
+      console.error('获取战利品图片失败:', error);
       setError(`网络请求失败: ${error.message}`);
     } finally {
       setLoading(false);
@@ -87,6 +78,17 @@ const Trophy = () => {
       fetchTrophyImages(page + 1, false);
     }
   };
+
+  const lastImageElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMoreImages();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
 
   // 处理筛选条件变化
   const handleFilterChange = (newFilters) => {
@@ -101,6 +103,21 @@ const Trophy = () => {
   useEffect(() => {
     fetchTrophyImages(1, true);
   }, [filters]);
+
+  // 监听props变化，更新filters
+  useEffect(() => {
+    if (selectedAnimal || selectedArea) {
+      setFilters(prev => ({
+        ...prev,
+        animalName: selectedAnimal || '',
+        areaName: selectedArea?.area || ''
+      }));
+      setPage(1);
+      setTimestamp(null);
+      setImages([]);
+      setHasMore(true);
+    }
+  }, [selectedAnimal, selectedArea]);
 
   // 验证和修复base64数据
   const validateBase64Image = (imageData, imageType) => {
@@ -158,29 +175,15 @@ const Trophy = () => {
       {/* 筛选栏 */}
       <div className={styles.filterBar}>
         <div className={styles.filterGroup}>
-          <label htmlFor="animal-select">猎物种类:</label>
-          <select 
-            id="animal-select"
-            value={filters.animalName} 
-            onChange={(e) => handleFilterChange({ animalName: e.target.value })}
-            className={styles.filterSelect}
-          >
-            <option value="">全部动物</option>
-            <option value="鹿">鹿</option>
-            <option value="熊">熊</option>
-            <option value="野猪">野猪</option>
-            <option value="狼">狼</option>
-            <option value="麋鹿">麋鹿</option>
-            <option value="驼鹿">驼鹿</option>
-          </select>
-        </div>
-
-        <div className={styles.filterGroup}>
           <label htmlFor="rating-select">奖杯评级:</label>
           <select 
             id="rating-select"
-            value={filters.rating || ''} 
-            onChange={(e) => handleFilterChange({ rating: e.target.value ? parseInt(e.target.value) : null })}
+            value={filters.rating !== null ? filters.rating.toString() : ''} 
+            onChange={(e) => {
+              const value = e.target.value;
+              const rating = value === '' ? null : parseInt(value);
+              handleFilterChange({ rating });
+            }}
             className={styles.filterSelect}
           >
             <option value="">全部评级</option>
@@ -261,7 +264,7 @@ const Trophy = () => {
             <div className={styles.imageInfo}>
               <div className={styles.imageHeader}>
                 <h3 className={styles.imageTitle}>
-                  🦌 {image.animalName}
+                  {image.animalName}
                 </h3>
                 <span className={styles.fileSize}>
                   {formatFileSize(image.fileSize)}
@@ -269,7 +272,7 @@ const Trophy = () => {
               </div>
               
               <div className={styles.locationInfo}>
-                <span className={styles.areaName}>� {image.areaName}</span>
+                <span className={styles.areaName}>{image.areaName}</span>
                 <span 
                   className={styles.ratingText}
                   style={{ color: getRatingColor(image.rating) }}
@@ -287,7 +290,7 @@ const Trophy = () => {
               <div className={styles.imageFooter}>
                 <div className={styles.uploaderInfo}>
                   <span className={styles.uploaderName}>
-                    � {image.uploaderNickname}
+                    {image.uploaderNickname}
                   </span>
                   <span className={styles.uploadTime}>
                     {formatUploadTime(image.uploadTime)}
@@ -303,14 +306,14 @@ const Trophy = () => {
       {loading && (
         <div className={styles.loadingContainer}>
           <div className={styles.loadingSpinner}></div>
-          <p>正在加载更多奖杯...</p>
+          <p>正在加载更多战利品...</p>
         </div>
       )}
 
       {/* 没有更多数据 */}
       {!hasMore && images.length > 0 && (
         <div className={styles.noMoreData}>
-          <p>已加载全部奖杯</p>
+          <p>已加载全部战利品</p>
         </div>
       )}
 
@@ -318,8 +321,8 @@ const Trophy = () => {
       {!loading && images.length === 0 && !error && (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>🏆</div>
-          <h3>暂无奖杯</h3>
-          <p>还没有上传奖杯图片，快去狩猎获得你的第一个奖杯吧！</p>
+          <h3>暂无战利品</h3>
+          <p>还没有上传战利品图片，快去狩猎获得你的第一个战利品吧！</p>
         </div>
       )}
     </div>

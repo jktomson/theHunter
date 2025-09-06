@@ -154,6 +154,7 @@ export const getLandscapeImages = async (filters = {}) => {
     const response = await request('/getLandscapeImages', {
       method: 'POST',
       body: {
+        areaName: filters.areaName || '',
         page: filters.page || 1,
         timestamp: filters.timestamp || null,
         sortBy: filters.sortBy || 'uploadTime',
@@ -175,10 +176,11 @@ export const getTrophyImages = async (filters = {}) => {
     const response = await request('/getTrophyImages', {
       method: 'POST',
       body: {
+        areaName: filters.areaName || '',
+        animalName: filters.animalName || '',
+        rating: filters.rating !== undefined && filters.rating !== null ? filters.rating : null,
         page: filters.page || 1,
         timestamp: filters.timestamp || null,
-        animalName: filters.animalName || '',
-        rating: filters.rating || null,
         sortBy: filters.sortBy || 'uploadTime',
         sortOrder: filters.sortOrder || 'desc',
         limit: filters.limit || 12

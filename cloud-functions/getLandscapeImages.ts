@@ -5,6 +5,7 @@ export default async function (ctx: FunctionContext) {
   try {
     // 获取请求参数
     const { 
+      areaName,           // 区域名称（可选）
       page = 1,           // 页码，默认第1页
       limit = 12,         // 每页数量，默认12条
       sortBy = 'uploadTime', // 排序字段
@@ -30,6 +31,11 @@ export default async function (ctx: FunctionContext) {
       animalName: '风景'  // 筛选风景图片
     }
 
+    // 添加可选筛选条件
+    if (areaName) {
+      whereConditions.areaName = areaName.trim()
+    }
+
     // 如果提供了时间戳，只查询在该时间点之前上传的图片
     // 这样可以保证分页期间新上传的图片不会影响已显示的内容
     if (timestamp) {
@@ -49,6 +55,13 @@ export default async function (ctx: FunctionContext) {
     const skip = (page - 1) * limit
 
     console.log('查询条件:', { whereConditions, sortField, sortDirection, skip, limit })
+
+    // 调试：打印区域过滤信息
+    if (areaName) {
+      console.log(`正在按区域过滤风景图片，区域名称: "${areaName}"`)
+    } else {
+      console.log('未指定区域，显示所有风景图片')
+    }
 
     // 查询风景图片列表
     const imagesQuery = await db.collection('images')
@@ -132,6 +145,7 @@ export default async function (ctx: FunctionContext) {
           timestamp: queryTimestamp // 传递时间戳给前端
         },
         filters: {
+          areaName: areaName || '',
           animalName: '风景',
           sortBy: sortBy,
           sortOrder: sortOrder
