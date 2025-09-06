@@ -89,6 +89,23 @@ const Landscape = () => {
     fetchLandscapeImages(1, true);
   }, [filters]);
 
+  // 验证和修复base64数据
+  const validateBase64Image = (imageData, imageType) => {
+    if (!imageData) return null;
+    
+    // 移除可能的前缀
+    let cleanData = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+    
+    // 验证base64格式
+    const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+    if (!base64Regex.test(cleanData)) {
+      console.error('无效的base64数据');
+      return null;
+    }
+    
+    return `data:${imageType || 'image/jpeg'};base64,${cleanData}`;
+  };
+
   // 格式化上传时间
   const formatUploadTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -168,10 +185,19 @@ const Landscape = () => {
           >
             <div className={styles.imageWrapper}>
               <img 
-                src={`data:${image.imageType};base64,${image.imageData}`}
+                src={validateBase64Image(image.imageData, image.imageType) || '/placeholder-image.svg'}
                 alt={image.description || '风景图片'}
                 className={styles.landscapeImage}
                 loading="lazy"
+                onError={(e) => {
+                  console.error('图片加载失败:', {
+                    id: image.id,
+                    imageType: image.imageType,
+                    imageDataLength: image.imageData?.length,
+                    imageDataStart: image.imageData?.substring(0, 50)
+                  });
+                  e.target.src = '/placeholder-image.svg';
+                }}
               />
               <div className={styles.imageOverlay}>
                 <div className={styles.imageStats}>

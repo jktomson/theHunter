@@ -115,22 +115,37 @@ export default async function (ctx: FunctionContext) {
     }
 
     // 格式化返回数据
-    const formattedImages = images.map(image => ({
-      id: image._id,
-      areaName: image.areaName,
-      animalName: image.animalName,
-      rating: image.rating,
-      ratingText: getRatingText(image.rating),
-      uploaderId: image.uploaderId,
-      uploaderNickname: image.uploaderNickname,
-      description: image.description || '',
-      imageData: image.imageData,
-      uploadTime: image.uploadTime,
-      viewCount: image.viewCount || 0,
-      likeCount: image.likeCount || 0,
-      fileSize: image.fileSize,
-      imageType: image.imageType
-    }))
+    const formattedImages = images.map(image => {
+      // 清理和验证图片数据
+      let cleanImageData = image.imageData;
+      if (cleanImageData) {
+        // 移除可能的data:image前缀
+        cleanImageData = cleanImageData.replace(/^data:image\/[a-z]+;base64,/, '');
+        // 简单验证base64格式（只包含有效字符）
+        const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+        if (!base64Regex.test(cleanImageData)) {
+          console.error('无效的base64数据格式:', image._id);
+          cleanImageData = null;
+        }
+      }
+
+      return {
+        id: image._id,
+        areaName: image.areaName,
+        animalName: image.animalName,
+        rating: image.rating,
+        ratingText: getRatingText(image.rating),
+        uploaderId: image.uploaderId,
+        uploaderNickname: image.uploaderNickname,
+        description: image.description || '',
+        imageData: cleanImageData,
+        uploadTime: image.uploadTime,
+        viewCount: image.viewCount || 0,
+        likeCount: image.likeCount || 0,
+        fileSize: image.fileSize,
+        imageType: image.imageType || 'image/jpeg'
+      }
+    })
 
     console.log(`奖杯图片查询成功: 区域=${areaName || '全部'}, 动物=${animalName || '全部'}, 评级=${rating ?? '全部'}, 第${page}页，共${total}条记录`)
 
