@@ -193,3 +193,42 @@ export const getTrophyImages = async (filters = {}) => {
     throw error
   }
 }
+
+// 获取图片评论
+export const getImageComments = async (imageId) => {
+  try {
+    const response = await request('/getImageComments', {
+      method: 'POST',
+      body: {
+        imageId: imageId
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.error('获取图片评论失败:', error)
+    throw error
+  }
+}
+
+// 添加评论
+export const addComment = async (commentData) => {
+  const { imageId, content, userId, userNickname } = commentData
+  
+  try {
+    const response = await request('/addComment', {
+      method: 'POST',
+      body: {
+        imageId: imageId,
+        content: content,
+        userId: userId,
+        userNickname: userNickname
+      }
+    })
+
+    return response
+  } catch (error) {
+    console.error('添加评论失败:', error)
+    throw error
+  }
+}

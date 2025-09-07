@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './trophy.module.css';
 import { getTrophyImages } from '../../utils/api';
 
 const Trophy = ({ selectedAnimal, selectedArea }) => {
+  const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -157,6 +159,11 @@ const Trophy = ({ selectedAnimal, selectedArea }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // 处理图片点击事件
+  const handleImageClick = (imageId) => {
+    navigate(`/comment/${imageId}`);
+  };
+
   // 获取评级颜色
   const getRatingColor = (rating) => {
     const colors = {
@@ -233,7 +240,11 @@ const Trophy = ({ selectedAnimal, selectedArea }) => {
             className={styles.waterfallItem}
             style={{ order: image.loadOrder || index }} // 确保顺序
           >
-            <div className={styles.imageWrapper}>
+            <div 
+              className={styles.imageWrapper}
+              onClick={() => handleImageClick(image.id)}
+              style={{ cursor: 'pointer' }}
+            >
               <img 
                 src={validateBase64Image(image.imageData, image.imageType) || '/placeholder-image.svg'}
                 alt={`${image.animalName} - ${image.ratingText}`}

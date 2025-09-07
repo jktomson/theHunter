@@ -6,6 +6,7 @@ import Landscape from "../pages/Landscape/landscape";
 import NotFound from "../pages/NotFound/notfound";
 import Register from "../pages/Register/register";
 import UserPage from "../pages/UserPage/userpage";
+import Comment from "../pages/Comment/comment";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
                 <UserPage></UserPage>
             </ProtectedRoute>
         )
+    },
+    {
+        path: '/comment/:imageId',
+        element: <Comment></Comment>
     },
     {
         path: '/home',
